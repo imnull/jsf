@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<script type="text/javascript" src="Timer.js"></script>
+</head>
+<body>
+
+<script type="text/javascript">
+
+Timer.promise((rate) => {
+	console.log(rate);
+}, {
+	onstart(){
+		console.log('start');
+		setTimeout(function(){
+			this.abort();
+		}.bind(this), 950)
+	},
+	onabort(){ console.log('abort') }
+}).then(() => {
+	console.log('end')
+});
+
+
+
+</script>
+
+</body>
+</html>

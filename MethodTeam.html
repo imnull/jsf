@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<script type="text/javascript" src="MethodTeam.js"></script>
+</head>
+<body>
+See console
+<script type="text/javascript">
+
+var mt = new MethodTeam();
+
+var m11 = mt.add('m1', function(op){
+	console.log('m11', ...arguments)
+});
+var m22 = mt.add('m2', function(op){
+	console.log('m22', ...arguments)
+});
+var m12 = mt.add('m1', function(op){
+	console.log('m12', ...arguments);
+	op.counter > 0 && op.distroy();	//DISTROY
+});
+var m13 = mt.add('m1', function(op){
+	console.log('m13', ...arguments)
+});
+
+
+var m21 = mt.add('m2', function(op){
+	console.log('m21', ...arguments)
+	op.counter > 1 && op.distroy();	//DISTROY
+});
+
+var m23 = mt.add('m2', function(op){
+	console.log('m23', ...arguments)
+});
+
+mt.fire('m1')
+mt.fire('m2')
+mt.fire('m1')
+mt.fire('m2')
+mt.fire('m1')
+mt.fire('m2')
+
+
+</script>
+
+</body>
+</html>
