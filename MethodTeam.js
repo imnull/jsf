@@ -24,6 +24,10 @@ MethodTeam.prototype = {
 		});
 		return key;
 	},
+	remove: function(key){
+		let idx = this.findIndex(key);
+		idx > -1 && this.methods.splice(idx, 1);
+	},
 	fire(name){
 
 		if(!this.has(name)) return;

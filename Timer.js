@@ -1,7 +1,7 @@
-function Timer(interval, step, delay){
+function Timer(interval, step, delay = 0){
 	this.interval = interval || 1000;
 	this.step = step || 30;
-	this.delay = delay || 500;
+	this.delay = typeof(delay) == 'number' && delay >= 0 ? delay : 500;
 }
 Timer.prototype = {
 	run: function(cb){

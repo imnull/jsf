@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<script type="text/javascript" src="./util.js"></script>
+<script type="text/javascript" src="./Timer.js"></script>
+<script type="text/javascript" src="./Point.js"></script>
+<script type="text/javascript" src="./MethodTeam.js"></script>
+<script type="text/javascript" src="./dmur.js"></script>
+<script type="text/javascript" src="./DragDecorator.js"></script>
+<style type="text/css">
+	
+
+.layer{
+	width: 100px;
+	height: 100px;
+	background: #ccc;
+	position: absolute;
+	left: 20px;
+	top: 20px;
+	/*border: 2px solid rgba(0,0,0,1);*/
+	user-select: none;
+	cursor: default;
+	border-radius: 50px;
+	/*transition: left,top 1s;*/
+}
+
+.bg{
+	position: absolute;
+	display: block;
+	left: 0px;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	width: 100%;
+	background-color: #666;
+}
+
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="layer layer1"></div>
+<div class="layer layer2"></div>
+<div class="layer layer3"></div>
+<div class="layer layer4"></div>
+<div class="layer layer4"></div>
+<div class="layer layer4"></div>
+<div class="layer layer4"></div>
+
+<script type="text/javascript">
+
+let layers = document.querySelectorAll('.layer');
+let decs = [];
+let DEST_0 = 100;
+
+function aniEng(cb){
+
+	let handle = null;
+	let state = 0;
+	let lastInterval = 0;
+
+	function req(interval){
+		if(state != 1) return;
+		interval = interval || 0;
+		cb(interval, interval - lastInterval, lastInterval);
+		lastInterval = interval;
+		return handle = requestAnimationFrame(req);
+	}
+
+	return {
+		start(){
+			if(state === 1) return;
+			state = 1;
+			handle = req();
+			return this;
+		},
+		stop(){
+			cancelAnimationFrame(handle);
+			state = 0;
+			handle = 0;
+			lastInterval = 0;
+			return this;
+		}
+	}
+}
+
+function cal(dec, decs){
+	dec = dec || decs[0];
+	let a = dec.willPos || dec.getDomPos();
+	let _decs = decs.slice(0);
+	_decs.splice(_decs.indexOf(dec), 1);
+	_decs.forEach(function(d){
+		if(d === dec) return;
+
+		let b = d.willPos || d.getDomPos();
+
+		let dest = Point.distance(...a, ...b);
+
+		if(dest >= DEST_0){
+			return;
+		}
+
+		let angle = Math.atan2(b[1] - a[1], b[0] - a[0]);
+		let deg = angle / (Math.PI / 180);
+		let dd = DEST_0 - dest;
+		let x = dd * Math.cos(angle);
+		let y = dd * Math.sin(angle);
+
+		d.oldPos = d.getDomPos();
+		d.willPos = [b[0] + x, b[1] + y];
+		d.offsetPos = [d.willPos[0] - d.oldPos[0], d.willPos[1] - d.oldPos[1]];
+
+		// if(!d.timer) d.timer = new Timer();
+
+		// d.timer.abort();
+		// d.timer.run((r) => {
+		// 	d.setDomPos(b[0] + x * r, b[1] + y * r).setDomStyle();
+		// })
+
+		d.setDomPos(b[0] + x, b[1] + y).setDomStyle();
+
+		cal(d, _decs);
+
+	})
+}
+
+
+
+layers.forEach(function(layer){
+	let d = dragDecorator()(layer, {
+		ondown: function(dom){
+			delete d.offsetPos;
+		},
+		onmove: function(dom, pos){
+
+			cal(d, decs);
+			// decs.forEach(function(d){
+			// 	if(d.offsetPos){
+			// 		d.ani();
+			// 	}
+			// })
+		}
+	});
+	d.ani = function(){
+
+		if(d.eng){
+			d.eng.stop();
+		}
+
+		d.eng = aniEng(function(i){
+
+			let r = Math.min(1, i / 600);
+			r = Math.pow(r, 0.3);
+
+			d.setDomPos(d.oldPos[0] + d.offsetPos[0] * r, d.oldPos[1] + d.offsetPos[1] * r).setDomStyle();
+
+			if(r == 1){
+				console.log(1)
+				d.eng.stop();
+				// delete d.willPos;
+				// delete d.oldPos;
+				// delete d.offsetPos;
+			}
+		});
+		d.eng.start();
+	}
+	decs.push(d);
+})
+cal(null, decs);
+decs.forEach(function(d){
+	if(d.offsetPos){
+		// d.ani();
+	}
+})
+
+
+</script>
+
+</body>
+</html>

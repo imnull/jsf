@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<script type="text/javascript" src="./util.js"></script>
+<script type="text/javascript" src="./Timer.js"></script>
+<script type="text/javascript" src="./Point.js"></script>
+<script type="text/javascript" src="./MethodTeam.js"></script>
+<script type="text/javascript" src="./dmur.js"></script>
+<script type="text/javascript" src="./DragDecorator.js"></script>
+<style type="text/css">
+	
+
+.layer{
+	width: 100px;
+	height: 100px;
+	background: #ccc;
+	position: absolute;
+	left: 20px;
+	top: 20px;
+	/*border: 2px solid rgba(0,0,0,1);*/
+	user-select: none;
+	cursor: default;
+	border-radius: 50px;
+	/*transition: left,top .2s;*/
+}
+
+.bg{
+	position: absolute;
+	display: block;
+	left: 0px;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	width: 100%;
+	background-color: #666;
+}
+
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="layer layer1"></div>
+<div class="layer layer2"></div>
+<!-- <div class="layer layer3"></div>
+<div class="layer layer4"></div> -->
+
+<script type="text/javascript">
+
+let layers = document.querySelectorAll('.layer');
+let decs = [];
+let DEST_0 = 100;
+
+function cal(dec, decs, level){
+	level = level || 0;
+	let a = dec.getDomPos();
+	// if(!level && dec.timer){
+	// 	dec.timer.abort();
+	// }
+	let _decs = decs.slice(0);
+	_decs.splice(_decs.indexOf(dec), 1);
+	_decs.forEach(function(d){
+		if(d === dec) return;
+
+		let b = d.getDomPos();
+
+		let dest = Point.distance(...a, ...b);
+
+		if(dest >= DEST_0){
+			return;
+		}
+
+		let angle = Math.atan2(b[1] - a[1], b[0] - a[0]);
+		let deg = angle / (Math.PI / 180);
+		let dd = DEST_0 - dest;
+		let x = dd * Math.cos(angle);
+		let y = dd * Math.sin(angle);
+
+		// if(!d.timer) d.timer = new Timer();
+
+		// d.timer.abort();
+		// d.timer.run((r) => {
+		// 	d.setDomPos(b[0] + x * r, b[1] + y * r).setDomStyle();
+		// })
+
+		d.setDomPos(b[0] + x, b[1] + y).setDomStyle();
+
+		cal(d, _decs, 0);
+
+	})
+}
+
+layers.forEach(function(layer){
+	let d = dragDecorator()(layer, {
+		onmove: function(dom, pos){
+
+			cal(d, decs)
+		}
+	});
+	decs.push(d);
+})
+
+
+</script>
+
+</body>
+</html>
