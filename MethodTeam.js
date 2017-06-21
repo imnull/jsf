@@ -28,7 +28,7 @@ MethodTeam.prototype = {
 
 		if(!this.has(name)) return;
 
-		let args = Array.prototype.slice.call(arguments, 0);
+		let args = [...arguments];
 
 		this.get(name).forEach((m, i) => {
 			m.op.counter += 1;
