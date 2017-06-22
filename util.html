@@ -2,16 +2,15 @@
 <html>
 <head>
 <title></title>
-<script type="text/javascript" src="util.js"></script>
+<script type="text/javascript" src="./src/util.js"></script>
 </head>
 <body>
 aaaa
 <script type="text/javascript">
 
-var util = JSFUtil();
 
-util.addEvent(document.body, 'mousedown', function(e){
-	console.log(util.getEventClientPosition(e))
+JSFUtil.addEvent(document.body, 'mousedown', function(e){
+	console.log(JSFUtil.getEventClientPosition(e))
 })
 
 </script>

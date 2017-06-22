@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<script type="text/javascript" src="./src/AnimationEngine.js"></script>
+</head>
+<body>
+
+See console.
+
+<script type="text/javascript">
+
+let eng = animationEngine({
+	start(){
+		console.log('start');
+	},
+	one(){
+		console.log(...arguments);
+	},
+	stop(){
+		console.log('end', ...arguments);
+	}
+});
+
+eng.start();
+
+setTimeout(function(){
+	eng.stop();
+
+	setTimeout(function(){
+		eng.start();
+
+		setTimeout(()=>{
+			eng.stop();
+			setTimeout(function(){
+				eng.start();
+
+				setTimeout(()=>{
+					eng.stop();
+				}, 500)
+			}, 500)
+		}, 500)
+	}, 500)
+}, 500);
+
+</script>
+
+</body>
+</html>
