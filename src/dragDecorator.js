@@ -70,12 +70,12 @@
 					pos = methods.onmove(dom, pos, e, op) || pos;
 				}
 
-				R.setDomPos(...pos);
+				R.setDomPos(...pos).setDomStyle();
 
 				// dom.style.transform = 'translate(' + state.domPos[0] + 'px,' + state.domPos[1] + 'px)';
 
-				dom.style.left = state.domPos[0] + 'px';
-				dom.style.top = state.domPos[1] + 'px';
+				// dom.style.left = state.domPos[0] + 'px';
+				// dom.style.top = state.domPos[1] + 'px';
 
 			});
 

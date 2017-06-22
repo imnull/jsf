@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<script type="text/javascript" src="./src/util.js"></script>
+<script type="text/javascript" src="./src/Timer.js"></script>
+<script type="text/javascript" src="./src/Point.js"></script>
+<script type="text/javascript" src="./src/MethodTeam.js"></script>
+<script type="text/javascript" src="./src/dmur.js"></script>
+<script type="text/javascript" src="./src/dragDecorator.js"></script>
+<script type="text/javascript" src="./src/animationEngine.js"></script>
+<style type="text/css">
+	
+
+.layer{
+	width: 100px;
+	height: 100px;
+	background: #ccc;
+	position: absolute;
+	
+	/*border: 2px solid rgba(0,0,0,1);*/
+	user-select: none;
+	cursor: default;
+	border-radius: 50px;
+	user-select: none;
+	-webkit-user-select: none;
+	/*transition: left,top .2s;*/
+}
+
+.layer1{
+	left: 120px;
+	top: 120px;
+	background-color: #f00;
+}
+
+.layer2{
+	left: 320px;
+	top: 320px;
+}
+
+
+</style>
+</head>
+<body>
+
+<div class="layer layer1"></div>
+<div class="layer layer2"></div>
+<script type="text/javascript">
+
+function Speed(v, a){
+	this.v = v;
+	this.a = a;
+}
+Speed.prototype = {
+	cal: function(t){
+		let s = Speed.s(this, t);
+		// this.v += this.a;
+		return s;
+	}
+};
+Speed.s = function(s, t){
+	if(!s.a) return s.v * t;
+	return s.v * t + 0.5 * s.a * t * t;
+};
+
+let sp = new Speed(10, -1);
+
+// let a = animationEngine((i, c) => {
+
+// 	i = i / 100;
+
+// 	let s = sp.cal(i);
+
+// 	console.log(sp)
+
+// 	console.log(s / 1);
+
+// 	if(c > 200) a.stop();
+
+// }).start();
+
+const DIST = 120;
+const STEP = 12;
+const CURVE = 0.6;
+
+function distance(x1, y1, x2, y2){
+	let x = x2 - x1;
+	let y = y2 - y1;
+	return Math.sqrt(x * x + y * y);
+}
+
+function aniMove(d, P, offsetX, offsetY){
+	let x1 = P[0], y1 = P[1];
+
+	let ani = animationEngine({
+		one(i){
+
+			let rate = Math.min(1, Math.max(0, i / ANI_DUR));
+
+			// rate = Math.pow(rate, 0.2);
+
+			let x = offsetX * rate + x1;
+			let y = offsetY * rate + y1;
+
+			d.setDomPos(x, y).setDomStyle();
+
+			if(rate >= 1){
+				ani.stop();
+			}
+
+		}
+		// ,
+		// start(){
+		// 	console.log('start');
+		// },
+		// stop(){
+		// 	console.log('end', ...arguments);
+		// }
+	});
+	ani.start();
+	return ani;
+}
+
+let ANI = animationEngine({
+	one(i, c){
+
+		if(!dB.target) return;
+
+		// if(dB.targetNew){
+		// 	dB.targetNew = 0;
+		// 	ANI.reset();
+		// }
+
+		let r = Math.min(1, ++dB.C / dB.steps);
+
+		r = Math.pow(r, CURVE);
+		// let pos = dB.oldPos;
+		let x = Math.round(dB.oldPos[0] + dB.target[0] * r);
+		let y = Math.round(dB.oldPos[1] + dB.target[1] * r);
+
+		// let x = Math.round(dB.oldPos[0] + dB.speedX.cal(i / 100));
+		// let y = Math.round(dB.oldPos[1] + dB.speedY.cal(i / 100));
+
+		dB.setDomPos(x, y).setDomStyle();
+
+		// if(r >= 1){
+		// 	ANI.stop();
+		// }
+	}
+});
+
+let layers = document.querySelectorAll('.layer');
+
+let dA = dragDecorator()(layers[0], {
+	onmove: function(dom, pos){
+
+		let _pos = dB.getDomPos();
+
+		let dis = distance(...pos, ..._pos);
+
+		if(dis >= DIST) return;
+
+		let offset = DIST - dis;
+		let angle = Math.atan2(_pos[1] - pos[1], _pos[0] - pos[0]);
+
+		let x = offset * Math.cos(angle);
+		let y = offset * Math.sin(angle);
+		dB.steps = Math.ceil(offset / STEP);
+		dB.steps = STEP;
+		dB.target = [x, y];
+		dB.speedX = new Speed(x, 0);
+		dB.speedY = new Speed(y, 0);
+		dB.oldPos = _pos;
+		dB.C = 0;
+		ANI.start();
+
+		// ANI.reset();
+		// dB.setDomPos(_pos[0] + x, _pos[1] + y).setDomStyle();
+
+		// if(dB.ani) dB.ani.stop();
+		// dB.ani = aniMove(dB, _pos, x, y);
+
+	}
+});
+
+let dB = dragDecorator()(layers[1], {
+	ondown: function(){
+		ANI.stop();
+	},
+	onmove: function(dom, pos){
+		console.log(pos)
+	}
+});
+
+console.log(dA)
+
+
+
+</script>
+</body>
+</html>

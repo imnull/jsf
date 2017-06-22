@@ -36,7 +36,7 @@
 
 		function req(){
 
-			if(state != 1){
+			if(!state){
 				return;
 			};
 
@@ -46,7 +46,10 @@
 
 				if(!startTS) startTS = ts;
 				if(!previTS) previTS = ts;
-				_one(ts - startTS, counter, ts - previTS);
+				// if(ts - startTS > 0){
+					_one(ts - startTS, counter, ts - previTS);
+				// }
+				
 				previTS = ts;
 				counter += 1;
 
@@ -55,6 +58,16 @@
 						if(counter > 0 && typeof(cb.stop) == 'function'){
 							cb.stop(counter);
 						}
+						break;
+					case 2:
+						startTS = null
+						previTS = null;
+						counter = 0;
+						state = 1;
+						if(typeof(cb.reset) == 'function'){
+							cb.reset(counter);
+						}
+						req();
 						break;
 					default:
 						req();
@@ -65,6 +78,14 @@
 		}
 
 		return {
+			reset(){
+				if(state === 1){
+					state = 2;
+				} else {
+					this.start();
+				}
+				return this;
+			},
 			start(){
 
 				if(state === 1) return;
